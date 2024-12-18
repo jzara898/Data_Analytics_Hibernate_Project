@@ -30,8 +30,11 @@ public class Application {
                     case 3 -> addCountry();
                     case 4 -> editCountry();
                     case 5 -> deleteCountry();
-                    case 6 -> running = false;
-                    default -> System.out.println("Invalid option. Please try again.");
+                    case 6 -> {
+                        System.out.println(". . . Shutting down . . . ");
+                        running = false;
+                    }
+                    default -> System.out.println("Sorry, that option is invalid. Please try again.");
                 }
             }
         } finally {
@@ -47,7 +50,7 @@ public class Application {
         System.out.println("4. Edit Country");
         System.out.println("5. Delete Country");
         System.out.println("6. Exit");
-        System.out.print("Enter your choice: ");
+        System.out.print("Please enter your choice: ");
     }
 
     private static void displayData() {
@@ -69,14 +72,14 @@ public class Application {
         System.out.print("Enter country code (3 characters): ");
         String code = scanner.nextLine().toUpperCase();
         if (code.length() != 3) {
-            System.out.println("Error: Country code must be exactly 3 characters.");
+            System.out.println("Error: The country code must be exactly 3 characters.");
             return;
         }
 
         try (Session session = sessionFactory.openSession()) {
             if (countryService.getCountryByCode(session, code).isPresent()) {
                 System.out.println("Error: Country with code '" + code + "' already exists.");
-                System.out.println("Use the edit option to modify existing countries.");
+                System.out.println("Please use the edit option to modify existing countries.");
                 return;
             }
 
@@ -129,11 +132,11 @@ public class Application {
 
             try {
                 countryService.saveCountry(session, country);
-                System.out.println("Country added successfully!");
+                System.out.println("Country add successful.");
             } catch (IllegalStateException e) {
                 System.out.println("Error: " + e.getMessage());
             } catch (Exception e) {
-                System.out.println("Error adding country: " + e.getMessage());
+                System.out.println("Sorry, there was an error adding country: " + e.getMessage());
             }
         }
     }
@@ -186,12 +189,12 @@ public class Application {
 
                         try {
                             countryService.updateCountry(session, country);
-                            System.out.println("Country updated successfully!");
+                            System.out.println("Country update successful.");
                         } catch (Exception e) {
-                            System.out.println("Error updating country: " + e.getMessage());
+                            System.out.println("Sorry, there was an error updating country: " + e.getMessage());
                         }
                     },
-                    () -> System.out.println("Country not found!")
+                    () -> System.out.println("No country found.")
             );
         }
     }
@@ -204,21 +207,21 @@ public class Application {
             countryService.getCountryByCode(session, code).ifPresentOrElse(
                     country -> {
                         System.out.println("Are you sure you want to delete: " + country);
-                        System.out.print("Enter 'YES' to confirm: ");
+                        System.out.print("Enter EXACTLY 'YES' to confirm: ");
                         String confirmation = scanner.nextLine();
 
                         if (confirmation.equals("YES")) {
                             try {
                                 countryService.deleteCountry(session, code);
-                                System.out.println("Country deleted successfully!");
+                                System.out.println("Country delete successful.");
                             } catch (Exception e) {
-                                System.out.println("Error deleting country: " + e.getMessage());
+                                System.out.println("Sorry, there was an error deleting country: " + e.getMessage());
                             }
                         } else {
-                            System.out.println("Deletion cancelled.");
+                            System.out.println("Deletion is cancelled.  Please try again.");
                         }
                     },
-                    () -> System.out.println("Country not found!")
+                    () -> System.out.println("No country found.")
             );
         }
     }
