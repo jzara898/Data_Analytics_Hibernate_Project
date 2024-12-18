@@ -7,7 +7,6 @@ import org.hibernate.Transaction;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.DoubleSummaryStatistics;
 import java.util.Comparator;
 import java.util.stream.Collectors;
 
@@ -72,27 +71,67 @@ public class CountryService {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             List<Country> countries = getAllCountries(session);
 
-            // Using Java streams for calculations
-            DoubleSummaryStatistics internetStats = countries.stream()
+            // For Internet Users
+            Country maxInternetCountry = countries.stream()
+                    .filter(c -> c.getInternetUsers() != null)
+                    .max(Comparator.comparing(Country::getInternetUsers))
+                    .orElse(null);
+
+            Country minInternetCountry = countries.stream()
+                    .filter(c -> c.getInternetUsers() != null)
+                    .min(Comparator.comparing(Country::getInternetUsers))
+                    .orElse(null);
+
+            double avgInternet = countries.stream()
                     .filter(c -> c.getInternetUsers() != null)
                     .mapToDouble(Country::getInternetUsers)
-                    .summaryStatistics();
+                    .average()
+                    .orElse(0.0);
 
-            DoubleSummaryStatistics literacyStats = countries.stream()
+            // For Literacy Rate
+            Country maxLiteracyCountry = countries.stream()
+                    .filter(c -> c.getAdultLiteracyRate() != null)
+                    .max(Comparator.comparing(Country::getAdultLiteracyRate))
+                    .orElse(null);
+
+            Country minLiteracyCountry = countries.stream()
+                    .filter(c -> c.getAdultLiteracyRate() != null)
+                    .min(Comparator.comparing(Country::getAdultLiteracyRate))
+                    .orElse(null);
+
+            double avgLiteracy = countries.stream()
                     .filter(c -> c.getAdultLiteracyRate() != null)
                     .mapToDouble(Country::getAdultLiteracyRate)
-                    .summaryStatistics();
+                    .average()
+                    .orElse(0.0);
 
+            // Display results
             System.out.println("\nStatistics:");
             System.out.println("Internet Users (per 100):");
-            System.out.printf("  Maximum: %.2f\n", internetStats.getMax());
-            System.out.printf("  Minimum: %.2f\n", internetStats.getMin());
-            System.out.printf("  Average: %.2f\n", internetStats.getAverage());
+            if (maxInternetCountry != null) {
+                System.out.printf("  Maximum: %.2f (%s)\n",
+                        maxInternetCountry.getInternetUsers(),
+                        maxInternetCountry.getName());
+            }
+            if (minInternetCountry != null) {
+                System.out.printf("  Minimum: %.2f (%s)\n",
+                        minInternetCountry.getInternetUsers(),
+                        minInternetCountry.getName());
+            }
+            System.out.printf("  Average: %.2f\n", avgInternet);
 
             System.out.println("\nAdult Literacy Rate:");
-            System.out.printf("  Maximum: %.2f\n", literacyStats.getMax());
-            System.out.printf("  Minimum: %.2f\n", literacyStats.getMin());
-            System.out.printf("  Average: %.2f\n", literacyStats.getAverage());
+            if (maxLiteracyCountry != null) {
+                System.out.printf("  Maximum: %.2f (%s)\n",
+                        maxLiteracyCountry.getAdultLiteracyRate(),
+                        maxLiteracyCountry.getName());
+            }
+            if (minLiteracyCountry != null) {
+                System.out.printf("  Minimum: %.2f (%s)\n",
+                        minLiteracyCountry.getAdultLiteracyRate(),
+                        minLiteracyCountry.getName());
+            }
+            System.out.printf("  Average: %.2f\n", avgLiteracy);
         }
     }
 }
