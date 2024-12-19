@@ -60,9 +60,9 @@ public class Application {
         try (Session session = sessionFactory.openSession()) {
             List<Country> countries = countryService.getAllCountries(session);
 
-            // Display header
-            System.out.println("\nCountry                             Internet Users    Literacy");
-            System.out.println("--------------------------------------------------------------------");
+            // Display header with code column
+            System.out.println("\nCode  Country                           Internet Users    Literacy");
+            System.out.println("------------------------------------------------------------------");
 
             // Display data
             countries.forEach(System.out::println);

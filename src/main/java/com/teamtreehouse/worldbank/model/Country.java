@@ -77,7 +77,8 @@ public class Country {
 
     @Override
     public String toString() {
-        return String.format("%-35s %10s %10s",
+        return String.format("%-3s  %-32s %10s %10s",
+                code,
                 name,
                 internetUsers != null ? String.format("%.2f", internetUsers) : "--",
                 adultLiteracyRate != null ? String.format("%.2f", adultLiteracyRate) : "--");
