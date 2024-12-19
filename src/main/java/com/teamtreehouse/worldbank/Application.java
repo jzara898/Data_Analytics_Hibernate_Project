@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Scanner;
 
 //TODO jcz: add detailed comments ahead of team presentation.
+//TODO jcz: add condition for country name - first letter should be capital.
+
 public class Application {
     private static final CountryService countryService = new CountryService();
     private static final Scanner scanner = new Scanner(System.in);
