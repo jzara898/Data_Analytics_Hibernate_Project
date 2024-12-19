@@ -34,37 +34,37 @@ public class CountryValidator {
 
         // Validate code
         if (country.getCode() == null || country.getCode().trim().isEmpty()) {
-            result.addError("Country code cannot be empty");
+            result.addError("Country code cannot be empty.");
         } else if (country.getCode().length() != 3) {
-            result.addError("Country code must be exactly 3 characters");
+            result.addError("Country code must be exactly 3 characters.");
         } else if (!country.getCode().matches("[A-Za-z]{3}")) {
-            result.addError("Country code must contain only letters");
+            result.addError("Country code must contain only letters.");
         }
 
         // Validate name
         if (country.getName() == null || country.getName().trim().isEmpty()) {
-            result.addError("Country name cannot be empty");
+            result.addError("Country name cannot be empty.");
         } else if (country.getName().length() > 32) {
-            result.addError("Country name cannot exceed 32 characters");
+            result.addError("Country name cannot exceed 32 characters.");
         }
 
         // Validate internetUsers
         if (country.getInternetUsers() != null) {
             if (country.getInternetUsers() < 0) {
-                result.addError("Internet users percentage cannot be negative");
+                result.addError("Internet users percentage cannot be negative.");
             }
             if (country.getInternetUsers() > 100) {
-                result.addError("Internet users percentage cannot exceed 100");
+                result.addError("Internet users percentage cannot exceed 100.");
             }
         }
 
         // Validate adultLiteracyRate
         if (country.getAdultLiteracyRate() != null) {
             if (country.getAdultLiteracyRate() < 0) {
-                result.addError("Adult literacy rate cannot be negative");
+                result.addError("Adult literacy rate cannot be negative.");
             }
             if (country.getAdultLiteracyRate() > 100) {
-                result.addError("Adult literacy rate cannot exceed 100");
+                result.addError("Adult literacy rate cannot exceed 100.");
             }
         }
 

@@ -26,7 +26,7 @@ public class CountryService {
     public void saveCountry(Session session, Country country) {
         // First check if country code already exists
         if (getCountryByCode(session, country.getCode()).isPresent()) {
-            throw new IllegalStateException("Country with code '" + country.getCode() + "' already exists.");
+            throw new IllegalStateException(" Sorry, country with code '" + country.getCode() + "' already exists.");
         }
 
         Transaction transaction = session.beginTransaction();

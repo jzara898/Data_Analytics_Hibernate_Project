@@ -10,6 +10,7 @@ import org.hibernate.SessionFactory;
 import java.util.List;
 import java.util.Scanner;
 
+//TODO jcz: add detailed comments ahead of team presentation.
 public class Application {
     private static final CountryService countryService = new CountryService();
     private static final Scanner scanner = new Scanner(System.in);
