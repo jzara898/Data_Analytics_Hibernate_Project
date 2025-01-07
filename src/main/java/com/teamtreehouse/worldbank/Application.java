@@ -34,7 +34,7 @@ public class Application {
                     case 4 -> editCountry();
                     case 5 -> deleteCountry();
                     case 6 -> {
-                        System.out.println(". . . Shutting down . . . ");
+                        System.out.println(" * * * Shutting down * * * ");
                         running = false;
                     }
                     default -> System.out.println("Sorry, that option is invalid. Please try again.");
