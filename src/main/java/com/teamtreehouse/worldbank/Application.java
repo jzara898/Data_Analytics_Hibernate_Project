@@ -10,23 +10,38 @@ import org.hibernate.SessionFactory;
 import java.util.List;
 import java.util.Scanner;
 
-//TODO jcz: add detailed comments ahead of team presentation.
-//TODO jcz: add condition for country name - first letter should be capital.
-
+/**
+ * Main application class for the World Bank Data Analysis program.
+ * This class implements a command-line interface for users to interact with World Bank data
+ * about internet usage and adult literacy rates across different countries.
+ *
+ * Key features:
+ * - View formatted data table of all countries
+ * - Display statistical analysis
+ * - Add new country records
+ * - Edit existing country data
+ * - Delete country records
+ */
 public class Application {
+    // Core service and utility instances used throughout the application
     private static final CountryService countryService = new CountryService();
     private static final Scanner scanner = new Scanner(System.in);
     private static final SessionFactory sessionFactory = HibernateUtil.getSessionFactory();
     private static final CountryValidator validator = new CountryValidator();
 
+    /**
+     * Main entry point of the application.
+     * Implements the main program loop and menu-driven interface.
+     */
     public static void main(String[] args) {
         try {
             boolean running = true;
             while (running) {
                 displayMenu();
                 int choice = scanner.nextInt();
-                scanner.nextLine(); // Consume newline
+                scanner.nextLine(); // Consume newline after numeric input
 
+                // Route user input to appropriate handler method
                 switch (choice) {
                     case 1 -> displayData();
                     case 2 -> countryService.displayStatistics();
@@ -41,10 +56,15 @@ public class Application {
                 }
             }
         } finally {
+            // Ensure proper cleanup of Hibernate resources
             HibernateUtil.shutdown();
         }
     }
 
+    /**
+     * Displays the main menu options to the user.
+     * Shows numbered list of available operations.
+     */
     private static void displayMenu() {
         System.out.println("\nWorld Bank Data Analysis");
         System.out.println("1. View Data Table");
@@ -56,22 +76,38 @@ public class Application {
         System.out.print("Please enter your choice: ");
     }
 
+    /**
+     * Displays formatted table of all country data.
+     * Uses a Hibernate session to retrieve and display country information.
+     * Formats output with fixed-width columns for readability.
+     */
     private static void displayData() {
         try (Session session = sessionFactory.openSession()) {
             List<Country> countries = countryService.getAllCountries(session);
 
-            // Display header with code column
+            // Format header with consistent column widths
             System.out.println("\nCode  Country                           Internet Users    Literacy");
             System.out.println("------------------------------------------------------------------");
 
-            // Display data
+            // Leverage Country.toString() for consistent formatting
             countries.forEach(System.out::println);
         }
     }
 
+    /**
+     * Handles the addition of a new country record.
+     * Implements input validation and data persistence.
+     * Process:
+     * 1. Collect and validate country code
+     * 2. Check for existing records
+     * 3. Collect remaining country data
+     * 4. Validate numeric inputs
+     * 5. Create and persist new country record
+     */
     private static void addCountry() {
         System.out.println("\nAdd New Country");
 
+        // Validate country code format
         System.out.print("Enter country code (3 characters): ");
         String code = scanner.nextLine().toUpperCase();
         if (code.length() != 3) {
@@ -80,12 +116,14 @@ public class Application {
         }
 
         try (Session session = sessionFactory.openSession()) {
+            // Check for duplicate country codes
             if (countryService.getCountryByCode(session, code).isPresent()) {
                 System.out.println("Error: Country with code '" + code + "' already exists.");
                 System.out.println("Please use the edit option to modify existing countries.");
                 return;
             }
 
+            // Collect remaining country data
             System.out.print("Enter country name: ");
             String name = scanner.nextLine();
 
@@ -99,6 +137,7 @@ public class Application {
             Double internetUsers = null;
             Double literacyRate = null;
 
+            // Validate internet users input if provided
             if (!internetUsersStr.isEmpty()) {
                 CountryValidator.ValidationResult internetValidation =
                         validator.validateInput(internetUsersStr, "Internet users", false);
@@ -109,6 +148,7 @@ public class Application {
                 internetUsers = Double.parseDouble(internetUsersStr);
             }
 
+            // Validate literacy rate input if provided
             if (!literacyRateStr.isEmpty()) {
                 CountryValidator.ValidationResult literacyValidation =
                         validator.validateInput(literacyRateStr, "Literacy rate", false);
@@ -119,6 +159,7 @@ public class Application {
                 literacyRate = Double.parseDouble(literacyRateStr);
             }
 
+            // Create new country using Builder pattern
             Country country = new Country.Builder()
                     .code(code)
                     .name(name)
@@ -126,13 +167,14 @@ public class Application {
                     .adultLiteracyRate(literacyRate)
                     .build();
 
-            // Validate the entire country object
+            // Validate complete country object
             CountryValidator.ValidationResult validation = validator.validate(country);
             if (!validation.isValid()) {
                 validation.displayErrors();
                 return;
             }
 
+            // Attempt to save the new country
             try {
                 countryService.saveCountry(session, country);
                 System.out.println("Country add successful.");
@@ -144,21 +186,29 @@ public class Application {
         }
     }
 
+    /**
+     * Handles the editing of existing country records.
+     * Implements field-by-field updates with validation.
+     * Allows users to keep existing values by pressing Enter.
+     */
     private static void editCountry() {
         System.out.print("\nEnter country code to edit: ");
         String code = scanner.nextLine().toUpperCase();
 
         try (Session session = sessionFactory.openSession()) {
+            // Use Optional to handle country lookup elegantly
             countryService.getCountryByCode(session, code).ifPresentOrElse(
                     country -> {
                         System.out.println("Current data: " + country);
 
+                        // Handle name update
                         System.out.print("Enter new name (or press Enter to keep current): ");
                         String name = scanner.nextLine();
                         if (!name.isEmpty()) {
                             country.setName(name);
                         }
 
+                        // Handle internet users update
                         System.out.print("Enter new internet users value (or press Enter to keep current): ");
                         String internetUsersStr = scanner.nextLine();
                         if (!internetUsersStr.isEmpty()) {
@@ -171,6 +221,7 @@ public class Application {
                             country.setInternetUsers(Double.parseDouble(internetUsersStr));
                         }
 
+                        // Handle literacy rate update
                         System.out.print("Enter new literacy rate (or press Enter to keep current): ");
                         String literacyRateStr = scanner.nextLine();
                         if (!literacyRateStr.isEmpty()) {
@@ -183,13 +234,14 @@ public class Application {
                             country.setAdultLiteracyRate(Double.parseDouble(literacyRateStr));
                         }
 
-                        // Validate the entire country object
+                        // Validate updated country object
                         CountryValidator.ValidationResult validation = validator.validate(country);
                         if (!validation.isValid()) {
                             validation.displayErrors();
                             return;
                         }
 
+                        // Attempt to persist updates
                         try {
                             countryService.updateCountry(session, country);
                             System.out.println("Country update successful.");
@@ -202,13 +254,19 @@ public class Application {
         }
     }
 
+    /**
+     * Handles the deletion of country records.
+     * Implements confirmation step to prevent accidental deletions.
+     */
     private static void deleteCountry() {
         System.out.print("\nEnter country code to delete: ");
         String code = scanner.nextLine().toUpperCase();
 
         try (Session session = sessionFactory.openSession()) {
+            // Use Optional to handle country lookup elegantly
             countryService.getCountryByCode(session, code).ifPresentOrElse(
                     country -> {
+                        // Show country data and require explicit confirmation
                         System.out.println("Are you sure you want to delete: " + country);
                         System.out.print("Enter EXACTLY 'YES' to confirm: ");
                         String confirmation = scanner.nextLine();
