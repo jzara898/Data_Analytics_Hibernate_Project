@@ -66,14 +66,14 @@ public class Application {
      * Shows numbered list of available operations.
      */
     private static void displayMenu() {
-        System.out.println("\nWorld Bank Data Analysis");
+        System.out.println("\n====World Bank Data Analysis====");
         System.out.println("1. View Data Table");
         System.out.println("2. View Statistics");
         System.out.println("3. Add Country");
         System.out.println("4. Edit Country");
         System.out.println("5. Delete Country");
         System.out.println("6. Exit");
-        System.out.print("Please enter your choice: ");
+        System.out.print("\nPlease enter your choice: \n");
     }
 
     /**
